@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #FAFAFA;
+    color: #262626;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  html.dark body {
+    background-color: #000000;
+    color: #F5F5F5;
+  }
+}
+
+/* Instagram Story Ring Gradient */
+.story-ring {
+  background: linear-gradient(45deg, #FCAF45 0%, #FF543E 50%, #C837AB 100%);
+  padding: 2px;
+  border-radius: 50%;
+}
+
+.story-ring-inner {
+  padding: 2px;
+  border-radius: 50%;
+}
+
+/* Aspect Ratio Classes */
+.aspect-4-5 {
+  aspect-ratio: 4 / 5;
+}
+.aspect-1-1 {
+  aspect-ratio: 1 / 1;
+}
+.aspect-3-4 {
+  aspect-ratio: 3 / 4;
+}
+.aspect-9-16 {
+  aspect-ratio: 9 / 16;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #DBDBDB;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+}
