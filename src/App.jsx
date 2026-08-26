@@ -9,6 +9,9 @@ import HistorySection from './components/HistorySection';
 import PricingModal from './components/PricingModal';
 import ApiKeyModal from './components/ApiKeyModal';
 import BrandModal from './components/BrandModal';
+import AuthModal from './components/AuthModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { syncUserProfileToCloud, fetchUserProfileFromCloud } from './services/firebase';
 import { generateContent } from './services/geminiService';
 import { generateStandaloneHtml, downloadHtmlFile } from './services/htmlExportService';
 import { Eye, MessageSquareText, PenTool, Sparkles, History, UserPlus } from 'lucide-react';
@@ -23,7 +26,8 @@ const safeJsonParse = (key, fallback) => {
   }
 };
 
-export default function App() {
+function MainApp() {
+  const { currentUser, logout, updateUserPlan } = useAuth();
   const historyRef = useRef(null);
 
   const [theme, setTheme] = useState(() => {
@@ -36,7 +40,7 @@ export default function App() {
 
   const [planType, setPlanType] = useState(() => {
     try {
-      return localStorage.getItem('postflow_plan_type') || 'free';
+      return currentUser?.planType || localStorage.getItem('postflow_plan_type') || 'free';
     } catch {
       return 'free';
     }
@@ -86,8 +90,40 @@ export default function App() {
   const [isApiKeyOpen, setIsApiKeyOpen] = useState(false);
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const [brandToEdit, setBrandToEdit] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    if (currentUser?.uid) {
+      fetchUserProfileFromCloud(currentUser.uid).then((cloudData) => {
+        if (cloudData) {
+          if (cloudData.brands && Array.isArray(cloudData.brands)) {
+            setBrands(cloudData.brands);
+            if (cloudData.brands.length > 0 && !selectedBrand) {
+              setSelectedBrand(cloudData.brands[0]);
+            }
+          }
+          if (cloudData.history && Array.isArray(cloudData.history)) {
+            setHistory(cloudData.history);
+          }
+          if (cloudData.planType) {
+            setPlanType(cloudData.planType);
+          }
+          if (cloudData.apiKey && !apiKey) {
+            setApiKey(cloudData.apiKey);
+          }
+        } else {
+          syncUserProfileToCloud(currentUser.uid, {
+            brands,
+            history,
+            planType,
+            apiKey
+          });
+        }
+      });
+    }
+  }, [currentUser?.uid]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -110,14 +146,20 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem('postflow_custom_brands', JSON.stringify(brands));
+      if (currentUser?.uid) {
+        syncUserProfileToCloud(currentUser.uid, { brands });
+      }
     } catch (e) {}
-  }, [brands]);
+  }, [brands, currentUser?.uid]);
 
   useEffect(() => {
     try {
       localStorage.setItem('postflow_history', JSON.stringify(history));
+      if (currentUser?.uid) {
+        syncUserProfileToCloud(currentUser.uid, { history });
+      }
     } catch (e) {}
-  }, [history]);
+  }, [history, currentUser?.uid]);
 
   useEffect(() => {
     try {
@@ -128,14 +170,20 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem('postflow_plan_type', planType);
+      if (currentUser?.uid) {
+        syncUserProfileToCloud(currentUser.uid, { planType });
+      }
     } catch (e) {}
-  }, [planType]);
+  }, [planType, currentUser?.uid]);
 
   useEffect(() => {
     try {
       localStorage.setItem('postflow_gemini_api_key', apiKey);
+      if (currentUser?.uid) {
+        syncUserProfileToCloud(currentUser.uid, { apiKey });
+      }
     } catch (e) {}
-  }, [apiKey]);
+  }, [apiKey, currentUser?.uid]);
 
   const handleOpenCreateBrand = () => {
     const maxBrandsAllowed = planType === 'free' ? 2 : (planType === 'base' ? 5 : Infinity);
@@ -273,6 +321,9 @@ export default function App() {
         credits={credits}
         isPro={isPro}
         planType={planType}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={logout}
         onOpenPricing={() => {
           setUpgradeReason('');
           setIsPricingOpen(true);
@@ -406,7 +457,7 @@ export default function App() {
           <HistorySection
             history={history}
             isPro={isPro}
-            selectedBrand={selectedBrand || { id: 'none', handle: '@perfil', name: 'Perfil' }}
+            selectedBrand={selectedBrand}
             onLoadPost={handleLoadPostFromHistory}
             onDeleteHistoryItem={handleDeleteHistoryItem}
             onOpenPricing={() => {
@@ -419,14 +470,18 @@ export default function App() {
       </main>
 
       <footer className="bg-white dark:bg-[#121212] border-t border-[#DBDBDB] dark:border-[#262626] py-6 text-center text-xs text-[#737373] dark:text-[#A8A8A8] mt-auto transition-colors duration-200">
-        <p>PostFlow AI Creator Suite · Desenvolvido para Criadores e Social Medias</p>
+        <p>PostFlow AI Creator Suite · Sincronização na Nuvem para Criadores e Social Medias</p>
       </footer>
 
       <PricingModal
         isOpen={isPricingOpen}
         onClose={() => setIsPricingOpen(false)}
         upgradeReason={upgradeReason}
-        onUpgradeSuccess={(chosenPlan) => setPlanType(chosenPlan === 'agency' ? 'agency' : 'base')}
+        onUpgradeSuccess={(chosenPlan) => {
+          const finalPlan = chosenPlan === 'agency' ? 'agency' : 'base';
+          setPlanType(finalPlan);
+          updateUserPlan(finalPlan);
+        }}
       />
 
       <ApiKeyModal
@@ -444,6 +499,19 @@ export default function App() {
         onDelete={handleDeleteBrand}
       />
 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }
