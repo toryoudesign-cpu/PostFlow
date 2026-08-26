@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Instagram, Crown, Key, Zap, Sun, Moon, History, Menu, X, Check } from 'lucide-react';
+import { Crown, Key, Zap, Sun, Moon, History, Menu, X, Check } from 'lucide-react';
 
 export default function Header({
   credits,
@@ -24,11 +24,13 @@ export default function Header({
     <header className="bg-white dark:bg-[#121212] border-b border-[#DBDBDB] dark:border-[#262626] sticky top-0 z-40 shadow-xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Logo & Brand */}
+        {/* Logo & Brand com Novo Ícone Oficial */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-[#FCAF45] via-[#FD1D1D] to-[#833AB4] flex items-center justify-center text-white shadow-md">
-            <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="PostFlow AI Logo"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md object-cover flex-shrink-0"
+          />
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="font-bold text-base sm:text-lg tracking-tight text-[#262626] dark:text-[#F5F5F5]">PostFlow</span>
@@ -43,7 +45,6 @@ export default function Header({
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 sm:gap-3">
           
-          {/* History Button */}
           <button
             onClick={onOpenHistory}
             className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border border-[#DBDBDB] dark:border-[#333333] bg-white dark:bg-[#1E1E1E] text-[#262626] dark:text-[#F5F5F5] hover:border-[#833AB4] hover:text-[#833AB4] transition-all"
@@ -63,7 +64,6 @@ export default function Header({
             )}
           </button>
 
-          {/* Dark / Light Mode Toggle */}
           <button
             onClick={onToggleTheme}
             title={theme === 'dark' ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
@@ -72,7 +72,6 @@ export default function Header({
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#737373]" />}
           </button>
 
-          {/* API Key settings button */}
           <button
             onClick={onOpenApiKey}
             title={hasApiKey ? 'Chave Gemini configurada' : 'Configurar Chave API Gemini'}
@@ -86,7 +85,6 @@ export default function Header({
             <span>{hasApiKey ? 'Gemini Ativo' : 'API Key'}</span>
           </button>
 
-          {/* Plan Status / Upgrade Button */}
           {isPro ? (
             <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#FD1D1D] text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-sm">
               <Crown className="w-4 h-4 text-amber-200" />
@@ -106,8 +104,6 @@ export default function Header({
 
         {/* Mobile Top Actions & Hamburger Button */}
         <div className="flex md:hidden items-center gap-2">
-          
-          {/* Quick Upgrade/Plan pill on Mobile */}
           {isPro ? (
             <span className="text-[10px] font-bold bg-pink-100 dark:bg-pink-950/60 text-[#E1306C] px-2.5 py-1 rounded-full border border-pink-200 dark:border-pink-900 flex items-center gap-1">
               <Crown className="w-3 h-3" />
@@ -123,11 +119,9 @@ export default function Header({
             </button>
           )}
 
-          {/* Hamburger Menu Toggle Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-xl border border-[#DBDBDB] dark:border-[#333333] bg-white dark:bg-[#1E1E1E] text-[#262626] dark:text-[#F5F5F5] hover:text-[#E1306C] transition-all"
-            aria-label="Abrir Menu"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -137,9 +131,8 @@ export default function Header({
 
       {/* Mobile Drawer Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[#DBDBDB] dark:border-[#262626] bg-white dark:bg-[#121212] px-4 py-4 space-y-2.5 shadow-xl animate-in slide-in-from-top-2 duration-150">
+        <div className="md:hidden border-t border-[#DBDBDB] dark:border-[#262626] bg-white dark:bg-[#121212] px-4 py-4 space-y-2.5 shadow-xl">
           
-          {/* API Key Button on Mobile */}
           <button
             onClick={() => handleMobileAction(onOpenApiKey)}
             className="w-full flex items-center justify-between p-3 rounded-xl border border-[#DBDBDB] dark:border-[#333333] bg-[#FAFAFA] dark:bg-[#1A1A1A] text-xs font-bold text-[#262626] dark:text-white"
@@ -158,7 +151,6 @@ export default function Header({
             {hasApiKey && <Check className="w-4 h-4 text-emerald-600" />}
           </button>
 
-          {/* History Button on Mobile */}
           <button
             onClick={() => handleMobileAction(onOpenHistory)}
             className="w-full flex items-center justify-between p-3 rounded-xl border border-[#DBDBDB] dark:border-[#333333] bg-[#FAFAFA] dark:bg-[#1A1A1A] text-xs font-bold text-[#262626] dark:text-white"
@@ -181,7 +173,6 @@ export default function Header({
             )}
           </button>
 
-          {/* Theme Switcher on Mobile */}
           <button
             onClick={onToggleTheme}
             className="w-full flex items-center justify-between p-3 rounded-xl border border-[#DBDBDB] dark:border-[#333333] bg-[#FAFAFA] dark:bg-[#1A1A1A] text-xs font-bold text-[#262626] dark:text-white"
@@ -197,7 +188,6 @@ export default function Header({
             </span>
           </button>
 
-          {/* Upgrade Plan Action on Mobile */}
           {!isPro && (
             <button
               onClick={() => handleMobileAction(onOpenPricing)}
