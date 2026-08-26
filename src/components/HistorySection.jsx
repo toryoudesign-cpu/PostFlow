@@ -40,7 +40,7 @@ export default function HistorySection({
             className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#FD1D1D] hover:opacity-95 text-white font-bold text-sm shadow-md shadow-pink-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5"
           >
             <Sparkles className="w-4 h-4 text-amber-200" />
-            <span>Desbloquear Histórico a partir de R$ 25/mês</span>
+            <span>Desbloquear Histórico a partir de R$ 10/mês</span>
           </button>
         </div>
       </div>

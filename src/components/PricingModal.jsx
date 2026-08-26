@@ -12,8 +12,8 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
   if (!isOpen) return null;
 
   const currentPrice = selectedPlan === 'pro'
-    ? (billingCycle === 'monthly' ? '25,00' : '19,00')
-    : (billingCycle === 'monthly' ? '50,00' : '39,00');
+    ? (billingCycle === 'monthly' ? '10,00' : '8,00')
+    : (billingCycle === 'monthly' ? '25,00' : '19,00');
 
   const planName = selectedPlan === 'pro' ? 'Plano Base (5 Marcas)' : 'Plano Equipe & Agência (Ilimitado)';
 
@@ -69,12 +69,12 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
             <span>Acelere sua Criação de Conteúdo</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
-            {showPixScreen ? 'Pagamento Seguro via PIX' : 'Desbloqueie o Plano PostFlow Pro'}
+            {showPixScreen ? 'Pagamento Seguro via PIX' : 'Planos Acessíveis a partir de R$ 10'}
           </h2>
           <p className="text-xs sm:text-sm text-white/90 max-w-md mx-auto">
             {showPixScreen
               ? `Você está assinando o ${planName} por R$ ${currentPrice}/mês.`
-              : (upgradeReason || 'Crie posts, acesse o histórico completo de postagens e gerencie múltiplos clientes sem limites.')}
+              : (upgradeReason || 'Crie posts ilimitados, acesse o histórico completo de postagens e gerencie múltiplos clientes sem complicação.')}
           </p>
 
           {!showPixScreen && (
@@ -94,7 +94,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
                 }`}
               >
                 <span>Anual</span>
-                <span className="bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">25% OFF</span>
+                <span className="bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">20% OFF</span>
               </button>
             </div>
           )}
@@ -108,7 +108,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               {/* Plans Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                 
-                {/* Base Plan Card - R$ 25 */}
+                {/* Base Plan Card - R$ 10 */}
                 <div
                   onClick={() => setSelectedPlan('pro')}
                   className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
@@ -126,7 +126,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
                   </div>
                   <div className="my-3">
                     <span className="text-3xl font-extrabold text-[#262626] dark:text-[#F5F5F5]">
-                      R$ {billingCycle === 'monthly' ? '25' : '19'}
+                      R$ {billingCycle === 'monthly' ? '10' : '8'}
                     </span>
                     <span className="text-xs text-[#737373] dark:text-[#A8A8A8]"> / mês</span>
                   </div>
@@ -150,7 +150,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
                   </ul>
                 </div>
 
-                {/* Team / Agency Plan Card - R$ 50 */}
+                {/* Team / Agency Plan Card - R$ 25 */}
                 <div
                   onClick={() => setSelectedPlan('agency')}
                   className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
@@ -168,7 +168,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
                   </div>
                   <div className="my-3">
                     <span className="text-3xl font-extrabold text-[#262626] dark:text-[#F5F5F5]">
-                      R$ {billingCycle === 'monthly' ? '50' : '39'}
+                      R$ {billingCycle === 'monthly' ? '25' : '19'}
                     </span>
                     <span className="text-xs text-[#737373] dark:text-[#A8A8A8]"> / mês</span>
                   </div>

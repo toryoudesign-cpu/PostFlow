@@ -174,9 +174,9 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
 
     if (brands.length >= maxBrandsAllowed) {
       if (planType === 'free') {
-        setUpgradeReason('Você atingiu o limite de 2 clientes do plano gratuito. Faça upgrade para o Plano Base (até 5 clientes por R$ 25/mês) ou Plano Equipe (ilimitados por R$ 50/mês)!');
+        setUpgradeReason('Você atingiu o limite de 2 clientes do plano gratuito. Faça upgrade para o Plano Base (até 5 clientes por R$ 10/mês) ou Plano Equipe (ilimitados por R$ 25/mês)!');
       } else if (planType === 'base') {
-        setUpgradeReason('Você atingiu o limite de 5 clientes do Plano Base. Faça upgrade para o Plano Equipe (clientes ilimitados por R$ 50/mês)!');
+        setUpgradeReason('Você atingiu o limite de 5 clientes do Plano Base. Faça upgrade para o Plano Equipe (clientes ilimitados por R$ 25/mês)!');
       }
       setIsPricingOpen(true);
       return;
