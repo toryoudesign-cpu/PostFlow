@@ -1,6 +1,41 @@
 import React, { useState } from 'react';
 import { Crown, Key, Zap, Sun, Moon, History, Menu, X, Check } from 'lucide-react';
 
+// Componente Vetorial SVG Oficial do Monograma PostFlow PF
+export function PostFlowIcon({ className = 'w-8 h-8 sm:w-9 sm:h-9' }) {
+  return (
+    <svg
+      viewBox="0 0 500 500"
+      className={`${className} flex-shrink-0 shadow-md rounded-xl overflow-hidden`}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="pf-monogram-grad" x1="0%" y1="15%" x2="100%" y2="85%">
+          <stop offset="0%" stopColor="#F94C43" />
+          <stop offset="35%" stopColor="#E1277B" />
+          <stop offset="70%" stopColor="#8A34CC" />
+          <stop offset="100%" stopColor="#5142E6" />
+        </linearGradient>
+      </defs>
+      
+      {/* Círculo de fundo com gradiente oficial */}
+      <circle cx="250" cy="250" r="250" fill="url(#pf-monogram-grad)" />
+      
+      {/* Geometria Branca do Monograma PF */}
+      <g fill="none" stroke="#FFFFFF" strokeWidth="28" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M 125 380 L 125 155 C 125 130 145 120 175 120 L 265 120" />
+        <path d="M 265 120 L 265 380" />
+        <path d="M 265 120 L 380 120" />
+        <path d="M 125 250 L 365 250" />
+      </g>
+      
+      {/* Dois Pontos de Destaque no braço do F */}
+      <circle cx="315" cy="185" r="17" fill="#FFFFFF" />
+      <circle cx="315" cy="285" r="17" fill="#FFFFFF" />
+    </svg>
+  );
+}
+
 export default function Header({
   credits,
   isPro,
@@ -24,13 +59,9 @@ export default function Header({
     <header className="bg-white dark:bg-[#121212] border-b border-[#DBDBDB] dark:border-[#262626] sticky top-0 z-40 shadow-xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Logo & Brand com Novo Ícone Oficial */}
+        {/* Logo & Brand com Ícone Vetorial Oficial PostFlow PF */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <img
-            src="/logo.png"
-            alt="PostFlow AI Logo"
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md object-cover flex-shrink-0"
-          />
+          <PostFlowIcon className="w-8 h-8 sm:w-9 sm:h-9" />
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="font-bold text-base sm:text-lg tracking-tight text-[#262626] dark:text-[#F5F5F5]">PostFlow</span>
