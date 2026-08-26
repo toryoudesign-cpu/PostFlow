@@ -9,128 +9,86 @@ import HistorySection from './components/HistorySection';
 import PricingModal from './components/PricingModal';
 import ApiKeyModal from './components/ApiKeyModal';
 import BrandModal from './components/BrandModal';
-import { presetBrands } from './data/presetBrands';
 import { generateContent } from './services/geminiService';
 import { generateStandaloneHtml, downloadHtmlFile } from './services/htmlExportService';
-import { Eye, MessageSquareText, PenTool, Sparkles, History } from 'lucide-react';
+import { Eye, MessageSquareText, PenTool, Sparkles, History, UserPlus } from 'lucide-react';
+
+const safeJsonParse = (key, fallback) => {
+  try {
+    const item = localStorage.getItem(key);
+    if (!item) return fallback;
+    return JSON.parse(item);
+  } catch (err) {
+    return fallback;
+  }
+};
 
 export default function App() {
   const historyRef = useRef(null);
 
-  // Theme state (light / dark)
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('postflow_theme') || 'light';
+    try {
+      return localStorage.getItem('postflow_theme') || 'light';
+    } catch {
+      return 'light';
+    }
   });
 
-  // Plan Type ('free' | 'base' | 'agency')
   const [planType, setPlanType] = useState(() => {
-    return localStorage.getItem('postflow_plan_type') || 'free';
+    try {
+      return localStorage.getItem('postflow_plan_type') || 'free';
+    } catch {
+      return 'free';
+    }
   });
 
-  // Helper boolean for isPro (either base or agency)
   const isPro = planType === 'base' || planType === 'agency';
 
-  // Brands / Personalities State (Trimmed to 2 preset brands for free tier by default if fresh)
   const [brands, setBrands] = useState(() => {
-    const saved = localStorage.getItem('postflow_custom_brands');
-    if (saved) return JSON.parse(saved);
-    // If not saved, start with 2 initial brands for free tier
-    return presetBrands.slice(0, 2);
+    return safeJsonParse('postflow_custom_brands', []);
   });
 
-  // Selected Brand state
   const [selectedBrand, setSelectedBrand] = useState(() => {
-    const saved = localStorage.getItem('postflow_custom_brands');
-    const list = saved ? JSON.parse(saved) : presetBrands;
-    return list[0] || presetBrands[0];
+    const saved = safeJsonParse('postflow_custom_brands', []);
+    return saved.length > 0 ? saved[0] : null;
   });
 
-  // Post History State
   const [history, setHistory] = useState(() => {
-    const saved = localStorage.getItem('postflow_history');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 'hist_initial',
-        brandId: presetBrands[0].id,
-        brandHandle: presetBrands[0].handle,
-        brandName: presetBrands[0].name,
-        format: 'simples',
-        topic: 'O cansaço que não passa dormindo',
-        aspectRatio: '4/5',
-        createdAt: new Date().toISOString(),
-        content: {
-          theme: 'O cansaço emocional que não se resolve dormindo',
-          hook: 'você dorme oito horas, descansa no fim de semana e na segunda-feira o corpo continua pesado.',
-          cardTitle: 'tem cansaço<br>que não se resolve<br>dormindo.',
-          cardSub: 'reflexão · sobrecarga mental',
-          caption: `você dorme oito horas.\ndescansa no fim de semana.\ne na segunda-feira o corpo continua pesado.\n\nisso acontece porque existe um cansaço que não é só físico.\né a mente que passou dias inteiros em estado de alerta.\n\no sono descansa o corpo.\nmas a mente só descansa quando a gente aprende a soltar a necessidade constante de controle e vigília. 🤍`,
-          hashtags: '#saúdemental #cansaçoemocional #terapia #manubarbosa',
-          designerGuidelines: {
-            visualDirection: 'Card tipográfico minimalista com fundo bege e tipografia em marrom escuro, 100% minúsculo.',
-            suggestedBgColor: '#F0E8DC',
-            suggestedTextColor: '#4A2B0F',
-            fontPairing: 'DM Serif Display + DM Sans'
-          }
-        }
-      }
-    ];
+    return safeJsonParse('postflow_history', []);
   });
 
-  // Aspect ratio state (4/5, 1/1, 3/4, 9/16)
   const [aspectRatio, setAspectRatio] = useState('4/5');
-
-  // Format and Topic
   const [format, setFormat] = useState('simples');
-  const [topic, setTopic] = useState('O cansaço que não passa dormindo e a sensação de carregar o mundo');
+  const [topic, setTopic] = useState('');
   const [customTone, setCustomTone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'preview', 'caption', 'designer', 'history'
+  const [activeTab, setActiveTab] = useState('all');
 
-  // Limits & ApiKey
   const [credits, setCredits] = useState(() => {
-    const saved = localStorage.getItem('postflow_credits');
-    return saved !== null ? parseInt(saved, 10) : 3;
-  });
-  const [apiKey, setApiKey] = useState(() => {
-    return localStorage.getItem('postflow_gemini_api_key') || '';
+    try {
+      const saved = localStorage.getItem('postflow_credits');
+      return saved !== null ? parseInt(saved, 10) : 3;
+    } catch {
+      return 3;
+    }
   });
 
-  // Modals
+  const [apiKey, setApiKey] = useState(() => {
+    try {
+      return localStorage.getItem('postflow_gemini_api_key') || '';
+    } catch {
+      return '';
+    }
+  });
+
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState('');
   const [isApiKeyOpen, setIsApiKeyOpen] = useState(false);
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const [brandToEdit, setBrandToEdit] = useState(null);
 
-  // Content Initial State (Dra. Manu Barbosa)
-  const [content, setContent] = useState({
-    theme: 'O cansaço emocional que não se resolve dormindo (hipervigilância e estado de alerta)',
-    hook: 'você dorme oito horas, descansa no fim de semana e na segunda-feira o corpo continua pesado.',
-    cardTitle: 'tem cansaço<br>que não se resolve<br>dormindo.',
-    cardSub: 'reflexão · sobrecarga mental & estado de alerta',
-    caption: `você dorme oito horas.
-descansa no fim de semana.
-e na segunda-feira o corpo continua pesado.
+  const [content, setContent] = useState(null);
 
-isso acontece porque existe um cansaço que não é só físico.
-é a mente que passou dias inteiros em estado de alerta.
-
-calculando riscos, tentando antecipar imprevistos, segurando a barra de todo mundo e sustentando a sensação de que você precisa dar conta de tudo sozinha.
-
-o sono descansa o corpo.
-mas a mente só descansa quando a gente aprende a soltar a necessidade constante de controle e vigília.
-
-e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar — é um processo que a gente constrói em terapia. 🤍`,
-    hashtags: '#saúdemental #cansaçoemocional #sobrecargamental #terapia #psicologiaonline #manubarbosa #autocuidado #autoconhecimento #londrina',
-    designerGuidelines: {
-      visualDirection: 'Card tipográfico minimalista com fundo bege e tipografia em marrom escuro, 100% minúsculo. Muito respiro e espaço negativo. Ou foto intimista da Manu com olhar contemplativo e luz natural suave.',
-      suggestedBgColor: '#F0E8DC',
-      suggestedTextColor: '#4A2B0F',
-      fontPairing: 'DM Serif Display + DM Sans'
-    }
-  });
-
-  // Handle Dark Mode toggle on <html> and <body>
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
@@ -140,35 +98,45 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
       root.classList.remove('dark');
       document.body.style.backgroundColor = '#FAFAFA';
     }
-    localStorage.setItem('postflow_theme', theme);
+    try {
+      localStorage.setItem('postflow_theme', theme);
+    } catch (e) {}
   }, [theme]);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Persist State
   useEffect(() => {
-    localStorage.setItem('postflow_custom_brands', JSON.stringify(brands));
+    try {
+      localStorage.setItem('postflow_custom_brands', JSON.stringify(brands));
+    } catch (e) {}
   }, [brands]);
 
   useEffect(() => {
-    localStorage.setItem('postflow_history', JSON.stringify(history));
+    try {
+      localStorage.setItem('postflow_history', JSON.stringify(history));
+    } catch (e) {}
   }, [history]);
 
   useEffect(() => {
-    localStorage.setItem('postflow_credits', credits.toString());
+    try {
+      localStorage.setItem('postflow_credits', credits.toString());
+    } catch (e) {}
   }, [credits]);
 
   useEffect(() => {
-    localStorage.setItem('postflow_plan_type', planType);
+    try {
+      localStorage.setItem('postflow_plan_type', planType);
+    } catch (e) {}
   }, [planType]);
 
   useEffect(() => {
-    localStorage.setItem('postflow_gemini_api_key', apiKey);
+    try {
+      localStorage.setItem('postflow_gemini_api_key', apiKey);
+    } catch (e) {}
   }, [apiKey]);
 
-  // Brand Handlers: Create with Plan Limits
   const handleOpenCreateBrand = () => {
     const maxBrandsAllowed = planType === 'free' ? 2 : (planType === 'base' ? 5 : Infinity);
 
@@ -202,22 +170,26 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
         return [...prev, brandData];
       }
     });
-
     setSelectedBrand(brandData);
   };
 
   const handleDeleteBrand = (brandId) => {
     setBrands((prev) => {
       const filtered = prev.filter(b => b.id !== brandId);
-      if (filtered.length > 0 && selectedBrand.id === brandId) {
-        setSelectedBrand(filtered[0]);
+      if (selectedBrand && selectedBrand.id === brandId) {
+        setSelectedBrand(filtered.length > 0 ? filtered[0] : null);
       }
       return filtered;
     });
   };
 
-  // Generation Handler
   const handleGenerate = async () => {
+    if (!selectedBrand) {
+      alert('Por favor, cadastre a sua primeira conta/cliente antes de gerar!');
+      handleOpenCreateBrand();
+      return;
+    }
+
     if (!isPro && credits <= 0) {
       setUpgradeReason('Você atingiu o limite de 3 gerações gratuitas. Desbloqueie o plano Pro para criar posts ilimitados!');
       setIsPricingOpen(true);
@@ -236,7 +208,6 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
 
       setContent(generated);
 
-      // Save to History automatically
       const newHistoryItem = {
         id: 'hist_' + Date.now(),
         brandId: selectedBrand.id,
@@ -261,14 +232,12 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
     }
   };
 
-  // History Actions
   const handleLoadPostFromHistory = (item) => {
     setContent(item.content);
     setFormat(item.format);
     if (item.aspectRatio) setAspectRatio(item.aspectRatio);
     setTopic(item.topic);
 
-    // Switch to target brand if available
     const targetBrand = brands.find(b => b.id === item.brandId);
     if (targetBrand) setSelectedBrand(targetBrand);
 
@@ -286,8 +255,8 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
     }
   };
 
-  // Export standalone HTML mini-site
   const handleExportHtml = () => {
+    if (!selectedBrand || !content) return;
     const htmlString = generateStandaloneHtml({
       brand: selectedBrand,
       content,
@@ -300,7 +269,6 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#000000] flex flex-col text-[#262626] dark:text-[#F5F5F5] transition-colors duration-200">
       
-      {/* Header */}
       <Header
         credits={credits}
         isPro={isPro}
@@ -314,13 +282,11 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenHistory={handleOpenHistorySection}
-        historyCount={history.filter(h => h.brandId === selectedBrand.id).length}
+        historyCount={selectedBrand ? history.filter(h => h.brandId === selectedBrand.id).length : history.length}
       />
 
-      {/* Main Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         
-        {/* Brand Selector with Create/Edit Actions and Limits */}
         <BrandKitSelector
           brands={brands}
           selectedBrand={selectedBrand}
@@ -331,7 +297,6 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
           planType={planType}
         />
 
-        {/* Content Creation Form */}
         <ContentGenerator
           topic={topic}
           setTopic={setTopic}
@@ -341,13 +306,12 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
           setCustomTone={setCustomTone}
           isLoading={isLoading}
           onGenerate={handleGenerate}
+          hasBrand={!!selectedBrand}
         />
 
-        {/* Output Section */}
-        {content && (
+        {content && selectedBrand && (
           <div className="space-y-4 pt-2">
             
-            {/* View Filter Tabs */}
             <div className="flex items-center justify-between border-b border-[#DBDBDB] dark:border-[#262626] pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#833AB4] to-[#E1306C] flex items-center justify-center text-white">
@@ -397,10 +361,8 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
               </div>
             </div>
 
-            {/* Content Display Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
-              {/* Left Column: Simulated Post with dynamic Aspect Ratio */}
               {(activeTab === 'all' || activeTab === 'preview') && (
                 <div className={activeTab === 'all' ? 'lg:col-span-5' : 'lg:col-span-12'}>
                   <PostPreview
@@ -414,7 +376,6 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
                 </div>
               )}
 
-              {/* Right Column: Caption + Designer Briefing */}
               {(activeTab === 'all' || activeTab === 'caption' || activeTab === 'designer') && (
                 <div className={activeTab === 'all' ? 'lg:col-span-7 space-y-6' : 'lg:col-span-12 space-y-6'}>
                   {(activeTab === 'all' || activeTab === 'caption') && (
@@ -441,12 +402,11 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
           </div>
         )}
 
-        {/* Pro Feature: History Section */}
         <div ref={historyRef} className="pt-4">
           <HistorySection
             history={history}
             isPro={isPro}
-            selectedBrand={selectedBrand}
+            selectedBrand={selectedBrand || { id: 'none', handle: '@perfil', name: 'Perfil' }}
             onLoadPost={handleLoadPostFromHistory}
             onDeleteHistoryItem={handleDeleteHistoryItem}
             onOpenPricing={() => {
@@ -458,12 +418,10 @@ e aprender a desacelerar esse alerta interno — com gentileza e sem se culpar �
 
       </main>
 
-      {/* Footer */}
       <footer className="bg-white dark:bg-[#121212] border-t border-[#DBDBDB] dark:border-[#262626] py-6 text-center text-xs text-[#737373] dark:text-[#A8A8A8] mt-auto transition-colors duration-200">
         <p>PostFlow AI Creator Suite · Desenvolvido para Criadores e Social Medias</p>
       </footer>
 
-      {/* Modals */}
       <PricingModal
         isOpen={isPricingOpen}
         onClose={() => setIsPricingOpen(false)}
