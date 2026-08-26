@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Zap, Sparkles, ShieldCheck, Crown, MessageCircle, ExternalLink } from 'lucide-react';
+import { X, Check, Zap, Sparkles, ShieldCheck, Crown, MessageCircle, ExternalLink, KeyRound } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const MERCADO_PAGO_LINKS = {
@@ -7,9 +7,21 @@ const MERCADO_PAGO_LINKS = {
   agency: 'https://mpago.la/2ay7dia'    // Plano Equipe R$ 25,00
 };
 
+// Códigos VIP de Ativação que só você (dono do app) conhece e passa para quem pagou
+const VALID_ACTIVATION_CODES = [
+  'POSTFLOW10',
+  'POSTFLOW25',
+  'PRO2026',
+  'VIP-POSTFLOW',
+  'TORYOU-PRO',
+  'EQUIPE-VIP'
+];
+
 export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgradeReason }) {
   const [selectedPlan, setSelectedPlan] = useState('pro');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [activationCode, setActivationCode] = useState('');
+  const [codeError, setCodeError] = useState('');
 
   if (!isOpen) return null;
 
@@ -21,22 +33,32 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
     window.open(checkoutUrl, '_blank');
   };
 
-  const handleConfirmPayment = () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      onUpgradeSuccess(selectedPlan);
+  const handleValidateCode = (e) => {
+    e.preventDefault();
+    const cleanCode = activationCode.trim().toUpperCase();
+
+    if (!cleanCode) {
+      setCodeError('Por favor, digite o código de ativação fornecido.');
+      return;
+    }
+
+    if (VALID_ACTIVATION_CODES.includes(cleanCode)) {
+      setCodeError('');
+      const targetPlan = (cleanCode === 'POSTFLOW25' || cleanCode === 'EQUIPE-VIP') ? 'agency' : selectedPlan;
+      onUpgradeSuccess(targetPlan);
       confetti({
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 }
       });
       onClose();
-    }, 1200);
+    } else {
+      setCodeError('Código de ativação inválido. Conclua o pagamento no Mercado Pago ou solicite seu código pelo WhatsApp.');
+    }
   };
 
-  const handleWhatsAppCheckout = () => {
-    const text = encodeURIComponent(`Olá! Tenho dúvidas sobre o *${planName}* do PostFlow AI no valor de R$ ${currentPrice}/mês.`);
+  const handleWhatsAppReceipt = () => {
+    const text = encodeURIComponent(`Olá! Acabei de realizar o pagamento do *${planName}* (R$ ${currentPrice}) pelo Mercado Pago. Segue o comprovante para liberação do meu código de ativação Pro!`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
 
@@ -45,7 +67,11 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
       <div className="bg-white dark:bg-[#1A1A1A] rounded-3xl max-w-2xl w-full border border-[#DBDBDB] dark:border-[#333333] shadow-2xl overflow-hidden relative text-[#262626] dark:text-[#F5F5F5] my-6">
         
         <button
-          onClick={onClose}
+          onClick={() => {
+            setShowCodeInput(false);
+            setCodeError('');
+            onClose();
+          }}
           className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all z-10"
         >
           <X className="w-5 h-5" />
@@ -159,27 +185,55 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               <span className="bg-white text-[#009EE3] rounded-full w-5 h-5 flex items-center justify-center font-extrabold text-xs">
                 MP
               </span>
-              <span>Pagar R$ {currentPrice} via Mercado Pago (PIX ou Cartão)</span>
+              <span>Pagar R$ {currentPrice} no Mercado Pago (PIX ou Cartão)</span>
               <ExternalLink className="w-4 h-4" />
             </button>
 
             <button
-              disabled={isProcessing}
-              onClick={handleConfirmPayment}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-900/20 flex items-center justify-center gap-2 transition-all"
+              type="button"
+              onClick={handleWhatsAppReceipt}
+              className="w-full py-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-500/40 hover:border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center gap-2 transition-all"
             >
-              <Check className="w-4 h-4" />
-              <span>{isProcessing ? 'Validando ativação...' : 'Já realizou o pagamento? Liberar Acesso Pro'}</span>
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              <span>Já paguei! Enviar comprovante no WhatsApp para liberar</span>
             </button>
 
-            <button
-              type="button"
-              onClick={handleWhatsAppCheckout}
-              className="w-full py-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:border-emerald-500/50 text-[#737373] dark:text-[#A8A8A8] hover:text-emerald-600 dark:hover:text-emerald-400 font-medium text-xs flex items-center justify-center gap-2 transition-all"
-            >
-              <MessageCircle className="w-4 h-4 text-emerald-500" />
-              <span>Dúvidas com o pagamento? Falar no WhatsApp</span>
-            </button>
+            {!showCodeInput ? (
+              <button
+                type="button"
+                onClick={() => setShowCodeInput(true)}
+                className="text-xs text-[#737373] dark:text-[#A8A8A8] hover:text-[#833AB4] dark:hover:text-pink-400 block mx-auto pt-1 font-medium transition-all"
+              >
+                Possui um código ou cupom de ativação? <span className="underline font-bold">Clique aqui</span>
+              </button>
+            ) : (
+              <form onSubmit={handleValidateCode} className="bg-[#FAFAFA] dark:bg-[#121212] p-3.5 rounded-xl border border-[#DBDBDB] dark:border-[#333333] space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#262626] dark:text-white">
+                  <KeyRound className="w-3.5 h-3.5 text-[#833AB4]" />
+                  <span>Código de Ativação VIP:</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={activationCode}
+                    onChange={(e) => setActivationCode(e.target.value)}
+                    placeholder="Ex: POSTFLOW10"
+                    className="flex-1 text-xs uppercase font-mono p-2.5 rounded-lg border border-[#DBDBDB] dark:border-[#333333] bg-white dark:bg-[#1E1E1E] text-[#262626] dark:text-white outline-none focus:border-[#833AB4]"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2.5 rounded-lg bg-[#833AB4] hover:bg-[#722e9e] text-white font-bold text-xs shadow-xs"
+                  >
+                    Ativar
+                  </button>
+                </div>
+                {codeError && (
+                  <p className="text-[11px] text-red-600 dark:text-red-400 font-medium">
+                    {codeError}
+                  </p>
+                )}
+              </form>
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-4 mt-4 text-[11px] text-[#737373] dark:text-[#A8A8A8]">
@@ -188,7 +242,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               <span>Pagamento Seguro Mercado Pago</span>
             </span>
             <span>•</span>
-            <span>Ativação Instantânea</span>
+            <span>Garantia de 7 dias</span>
           </div>
 
         </div>
