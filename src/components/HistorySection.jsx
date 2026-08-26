@@ -11,10 +11,11 @@ export default function HistorySection({
   onDeleteHistoryItem,
   onOpenPricing
 }) {
-  const [filterBrandId, setFilterBrandId] = useState('all');
+  const [filterBrandId, setFilterBrandId] = useState('all'); // default to 'all'
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedId, setCopiedId] = useState(null);
 
+  // If user is not Pro, show the locked monetization card
   if (!isPro) {
     return (
       <div className="bg-white dark:bg-[#121212] rounded-2xl border border-[#DBDBDB] dark:border-[#262626] p-8 shadow-xs text-center relative overflow-hidden transition-colors duration-200">
@@ -46,6 +47,7 @@ export default function HistorySection({
     );
   }
 
+  // Safe History Filtering with full optional chaining
   const currentBrandId = selectedBrand?.id || '';
   const currentBrandHandle = selectedBrand?.handle || 'todos os clientes';
 
@@ -96,6 +98,7 @@ export default function HistorySection({
   return (
     <div className="bg-white dark:bg-[#121212] rounded-2xl border border-[#DBDBDB] dark:border-[#262626] p-5 sm:p-6 shadow-xs transition-colors duration-200">
       
+      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[#DBDBDB] dark:border-[#262626]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#833AB4] to-[#E1306C] flex items-center justify-center text-white shadow-xs">
@@ -114,7 +117,9 @@ export default function HistorySection({
           </div>
         </div>
 
+        {/* Filter Controls */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Search Box */}
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-[#737373] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -126,6 +131,7 @@ export default function HistorySection({
             />
           </div>
 
+          {/* Filter Brand Toggle */}
           {selectedBrand && (
             <div className="inline-flex rounded-xl border border-[#DBDBDB] dark:border-[#333333] p-0.5 bg-[#FAFAFA] dark:bg-[#1A1A1A] text-xs">
               <button
@@ -149,6 +155,7 @@ export default function HistorySection({
         </div>
       </div>
 
+      {/* History Items Grid / List */}
       {filteredHistory.length === 0 ? (
         <div className="py-12 text-center border-2 border-dashed border-[#DBDBDB] dark:border-[#262626] rounded-xl bg-[#FAFAFA]/50 dark:bg-[#1A1A1A]/30">
           <History className="w-8 h-8 text-[#8E8E8E] mx-auto mb-2 opacity-50" />
@@ -171,6 +178,7 @@ export default function HistorySection({
                 className="p-4 rounded-xl border border-[#DBDBDB] dark:border-[#262626] bg-[#FAFAFA] dark:bg-[#1A1A1A] hover:border-[#833AB4] transition-all flex flex-col justify-between group"
               >
                 <div>
+                  {/* Top Badges */}
                   <div className="flex items-center justify-between text-[11px] mb-2">
                     <span className="font-bold text-[#833AB4] dark:text-pink-400 truncate max-w-[130px]">
                       {item.brandHandle || '@perfil'}
@@ -183,15 +191,18 @@ export default function HistorySection({
                     </div>
                   </div>
 
+                  {/* Topic Title */}
                   <h4 className="font-bold text-xs text-[#262626] dark:text-[#F5F5F5] line-clamp-2 mb-1.5">
                     {item.topic}
                   </h4>
 
+                  {/* Snippet */}
                   <p className="text-[11px] text-[#737373] dark:text-[#A8A8A8] line-clamp-3 mb-3 leading-relaxed">
                     {item.content?.cardTitle ? item.content.cardTitle.replace(/<br>/g, ' ') : (item.content?.theme || '')}
                   </p>
                 </div>
 
+                {/* Actions Footer */}
                 <div className="pt-3 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-1">
                   <div className="flex items-center gap-1">
                     <button

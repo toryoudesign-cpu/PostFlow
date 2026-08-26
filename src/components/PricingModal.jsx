@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Zap, Sparkles, ShieldCheck, Crown, MessageCircle, ExternalLink, KeyRound } from 'lucide-react';
+import { X, Check, Zap, Sparkles, ShieldCheck, Crown, MessageCircle, ExternalLink, Lock, KeyRound } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const MERCADO_PAGO_LINKS = {
@@ -66,6 +66,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
       <div className="bg-white dark:bg-[#1A1A1A] rounded-3xl max-w-2xl w-full border border-[#DBDBDB] dark:border-[#333333] shadow-2xl overflow-hidden relative text-[#262626] dark:text-[#F5F5F5] my-6">
         
+        {/* Close Button */}
         <button
           onClick={() => {
             setShowCodeInput(false);
@@ -77,6 +78,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
           <X className="w-5 h-5" />
         </button>
 
+        {/* Modal Header */}
         <div className="bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#FD1D1D] p-6 sm:p-8 text-white text-center relative overflow-hidden">
           <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5 text-amber-200" />
@@ -90,9 +92,13 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
           </p>
         </div>
 
+        {/* Modal Body */}
         <div className="p-6 sm:p-8">
+          
+          {/* Plans Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             
+            {/* Base Plan */}
             <div
               onClick={() => setSelectedPlan('pro')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
@@ -134,6 +140,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               </ul>
             </div>
 
+            {/* Agency Plan */}
             <div
               onClick={() => setSelectedPlan('agency')}
               className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
@@ -177,7 +184,10 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
 
           </div>
 
+          {/* Action Buttons */}
           <div className="space-y-3">
+            
+            {/* Primary Button: Pagar no Mercado Pago */}
             <button
               onClick={handleOpenMercadoPago}
               className="w-full py-4 rounded-2xl bg-[#009EE3] hover:bg-[#0081B8] text-white font-bold text-sm shadow-lg shadow-sky-500/20 flex items-center justify-center gap-2.5 transition-all transform hover:-translate-y-0.5"
@@ -189,6 +199,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               <ExternalLink className="w-4 h-4" />
             </button>
 
+            {/* WhatsApp Receipt Button */}
             <button
               type="button"
               onClick={handleWhatsAppReceipt}
@@ -198,6 +209,7 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
               <span>Já paguei! Enviar comprovante no WhatsApp para liberar</span>
             </button>
 
+            {/* Secret Activation Code Toggle Form */}
             {!showCodeInput ? (
               <button
                 type="button"
@@ -234,8 +246,10 @@ export default function PricingModal({ isOpen, onClose, onUpgradeSuccess, upgrad
                 )}
               </form>
             )}
+
           </div>
 
+          {/* Trust Badges */}
           <div className="flex items-center justify-center gap-4 mt-4 text-[11px] text-[#737373] dark:text-[#A8A8A8]">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />

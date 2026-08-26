@@ -28,6 +28,7 @@ export default function ContentGenerator({
   return (
     <div className="bg-white dark:bg-[#121212] rounded-2xl border border-[#DBDBDB] dark:border-[#262626] p-5 sm:p-6 shadow-xs transition-colors duration-200">
       
+      {/* Step 1: Format Selector */}
       <div className="mb-5">
         <label className="text-xs font-bold text-[#262626] dark:text-[#F5F5F5] uppercase tracking-wider block mb-2">
           1. Escolha o Formato da Publicação
@@ -62,6 +63,7 @@ export default function ContentGenerator({
         </div>
       </div>
 
+      {/* Step 2: Topic & Generation Form */}
       <div>
         <label className="text-xs font-bold text-[#262626] dark:text-[#F5F5F5] uppercase tracking-wider block mb-2">
           2. Qual é o Tema ou Ideia Central do Post?
@@ -77,6 +79,7 @@ export default function ContentGenerator({
           />
         </div>
 
+        {/* Quick Topic Suggestions */}
         <div className="flex flex-wrap items-center gap-1.5 mb-5">
           <span className="text-[11px] text-[#737373] dark:text-[#A8A8A8] font-medium flex items-center gap-1">
             <Wand2 className="w-3 h-3 text-[#833AB4]" />
@@ -94,6 +97,7 @@ export default function ContentGenerator({
           ))}
         </div>
 
+        {/* Submit Generate Button */}
         <button
           disabled={isLoading || !topic.trim()}
           onClick={onGenerate}

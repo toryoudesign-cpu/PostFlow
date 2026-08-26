@@ -48,7 +48,9 @@ export default function BrandKitSelector({
         </button>
       </div>
 
+      {/* Brands Display Grid */}
       {brands.length === 0 ? (
+        /* Empty State: Prompt user to create their first client */
         <div className="border-2 border-dashed border-[#DBDBDB] dark:border-[#262626] rounded-2xl p-6 sm:p-8 text-center bg-[#FAFAFA]/50 dark:bg-[#1A1A1A]/30">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#833AB4] to-[#E1306C] text-white flex items-center justify-center mx-auto mb-3 shadow-md">
             <UserPlus className="w-6 h-6" />
@@ -122,6 +124,7 @@ export default function BrandKitSelector({
 
                 <p className="text-[11px] text-[#737373] dark:text-[#A8A8A8] mt-2 line-clamp-1">{brand.niche}</p>
 
+                {/* Color Swatch Dots */}
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-black/5 dark:border-white/5">
                   <div className="flex items-center gap-1.5">
                     <span className="w-3 h-3 rounded-full border border-black/10 shadow-2xs" style={{ background: brand.colors?.primary || '#833AB4' }} />
@@ -138,6 +141,7 @@ export default function BrandKitSelector({
             );
           })}
 
+          {/* Create New Brand Quick Card */}
           <button
             type="button"
             onClick={onOpenCreateBrand}

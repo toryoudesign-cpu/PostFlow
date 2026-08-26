@@ -163,6 +163,7 @@ export default function Header({
               </button>
             )}
 
+            {/* Profile Dropdown Menu */}
             {isProfileDropdownOpen && currentUser && (
               <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-[#DBDBDB] dark:border-[#333333] bg-white dark:bg-[#1A1A1A] p-3 shadow-xl z-50 space-y-2 text-left">
                 <div className="pb-2 border-b border-black/5 dark:border-white/5">
@@ -228,6 +229,7 @@ export default function Header({
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-[#DBDBDB] dark:border-[#262626] bg-white dark:bg-[#121212] px-4 py-4 space-y-2.5 shadow-xl">
           
+          {/* Mobile User Profile Status */}
           {currentUser ? (
             <div className="p-3 rounded-xl bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-900 flex items-center justify-between">
               <div>

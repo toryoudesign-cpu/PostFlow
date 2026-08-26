@@ -30,6 +30,7 @@ function MainApp() {
   const { currentUser, logout, updateUserPlan } = useAuth();
   const historyRef = useRef(null);
 
+  // Theme state
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('postflow_theme') || 'light';
@@ -38,6 +39,7 @@ function MainApp() {
     }
   });
 
+  // Plan Type ('free' | 'base' | 'agency')
   const [planType, setPlanType] = useState(() => {
     try {
       return currentUser?.planType || localStorage.getItem('postflow_plan_type') || 'free';
@@ -48,26 +50,33 @@ function MainApp() {
 
   const isPro = planType === 'base' || planType === 'agency';
 
+  // Brands List
   const [brands, setBrands] = useState(() => {
     return safeJsonParse('postflow_custom_brands', []);
   });
 
+  // Selected Brand
   const [selectedBrand, setSelectedBrand] = useState(() => {
     const saved = safeJsonParse('postflow_custom_brands', []);
     return saved.length > 0 ? saved[0] : null;
   });
 
+  // History List
   const [history, setHistory] = useState(() => {
     return safeJsonParse('postflow_history', []);
   });
 
+  // Aspect ratio state (4/5, 1/1, 3/4, 9/16)
   const [aspectRatio, setAspectRatio] = useState('4/5');
+
+  // Format and Topic
   const [format, setFormat] = useState('simples');
   const [topic, setTopic] = useState('');
   const [customTone, setCustomTone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
 
+  // Limits & ApiKey
   const [credits, setCredits] = useState(() => {
     try {
       const saved = localStorage.getItem('postflow_credits');
@@ -85,6 +94,7 @@ function MainApp() {
     }
   });
 
+  // Modals
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [upgradeReason, setUpgradeReason] = useState('');
   const [isApiKeyOpen, setIsApiKeyOpen] = useState(false);
@@ -94,6 +104,7 @@ function MainApp() {
 
   const [content, setContent] = useState(null);
 
+  // Sync with Cloud on user login
   useEffect(() => {
     if (currentUser?.uid) {
       fetchUserProfileFromCloud(currentUser.uid).then((cloudData) => {
@@ -114,6 +125,7 @@ function MainApp() {
             setApiKey(cloudData.apiKey);
           }
         } else {
+          // Push local data to cloud for new user
           syncUserProfileToCloud(currentUser.uid, {
             brands,
             history,
@@ -125,6 +137,7 @@ function MainApp() {
     }
   }, [currentUser?.uid]);
 
+  // Dark Mode
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
@@ -143,6 +156,7 @@ function MainApp() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Sync state to local and cloud
   useEffect(() => {
     try {
       localStorage.setItem('postflow_custom_brands', JSON.stringify(brands));
@@ -185,6 +199,7 @@ function MainApp() {
     } catch (e) {}
   }, [apiKey, currentUser?.uid]);
 
+  // Brand Handlers
   const handleOpenCreateBrand = () => {
     const maxBrandsAllowed = planType === 'free' ? 2 : (planType === 'base' ? 5 : Infinity);
 
@@ -231,6 +246,7 @@ function MainApp() {
     });
   };
 
+  // Generation Handler
   const handleGenerate = async () => {
     if (!selectedBrand) {
       alert('Por favor, cadastre a sua primeira conta/cliente antes de gerar!');
@@ -317,6 +333,7 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#000000] flex flex-col text-[#262626] dark:text-[#F5F5F5] transition-colors duration-200">
       
+      {/* Header with Cloud Auth Support */}
       <Header
         credits={credits}
         isPro={isPro}
@@ -336,8 +353,10 @@ function MainApp() {
         historyCount={selectedBrand ? history.filter(h => h.brandId === selectedBrand.id).length : history.length}
       />
 
+      {/* Main Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         
+        {/* Brand Selector */}
         <BrandKitSelector
           brands={brands}
           selectedBrand={selectedBrand}
@@ -348,6 +367,7 @@ function MainApp() {
           planType={planType}
         />
 
+        {/* Content Creation Form */}
         <ContentGenerator
           topic={topic}
           setTopic={setTopic}
@@ -360,6 +380,7 @@ function MainApp() {
           hasBrand={!!selectedBrand}
         />
 
+        {/* Output Section (Only shown after generating content) */}
         {content && selectedBrand && (
           <div className="space-y-4 pt-2">
             
@@ -453,6 +474,7 @@ function MainApp() {
           </div>
         )}
 
+        {/* History Section */}
         <div ref={historyRef} className="pt-4">
           <HistorySection
             history={history}
@@ -473,6 +495,7 @@ function MainApp() {
         <p>PostFlow AI Creator Suite · Sincronização na Nuvem para Criadores e Social Medias</p>
       </footer>
 
+      {/* Modals */}
       <PricingModal
         isOpen={isPricingOpen}
         onClose={() => setIsPricingOpen(false)}

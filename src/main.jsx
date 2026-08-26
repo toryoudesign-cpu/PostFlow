@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 
-// Barreira de auto-recuperação anti-tela-branca
+// Automated Error Boundary for Mobile / Production Auto-Recovery
 class GlobalErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

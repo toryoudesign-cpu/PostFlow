@@ -1,15 +1,23 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { 
   getAuth, 
-  GoogleAuthProvider 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  updateProfile
 } from 'firebase/auth';
 import { 
   getFirestore, 
   doc, 
   setDoc, 
-  getDoc 
+  getDoc, 
+  onSnapshot 
 } from 'firebase/firestore';
 
+// Default Firebase Configuration (can be overridden with VITE_FIREBASE_* env vars)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyPostFlowDefaultKeyDemo2026",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "postflow-app.firebaseapp.com",
@@ -19,6 +27,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1029384756:web:abcd1234ef5678"
 };
 
+// Check if valid Firebase configuration is present
 export const isFirebaseConfigured = () => {
   return (
     import.meta.env.VITE_FIREBASE_API_KEY &&
@@ -43,8 +52,10 @@ try {
 
 export { auth, db, googleProvider };
 
+// Cloud Synchronization Services
 export const syncUserProfileToCloud = async (userId, data) => {
   if (!db || !isFirebaseConfigured()) {
+    // Fallback to local storage persistence
     localStorage.setItem(`postflow_cloud_sync_${userId}`, JSON.stringify(data));
     return;
   }

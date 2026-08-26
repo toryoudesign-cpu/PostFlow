@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Lock, Mail, User, ShieldCheck, ArrowRight, Smartphone, Laptop } from 'lucide-react';
+import { X, Sparkles, Lock, Mail, User, ShieldCheck, ArrowRight, Smartphone, Laptop, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import confetti from 'canvas-confetti';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }) {
   const { loginWithGoogle, loginWithEmail, signupWithEmail } = useAuth();
   
-  const [tab, setTab] = useState('login');
+  const [tab, setTab] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -74,6 +74,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm overflow-y-auto">
       <div className="bg-white dark:bg-[#1A1A1A] rounded-3xl max-w-md w-full border border-[#DBDBDB] dark:border-[#333333] shadow-2xl overflow-hidden relative text-[#262626] dark:text-[#F5F5F5] my-6">
         
+        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all z-10"
@@ -81,6 +82,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           <X className="w-5 h-5" />
         </button>
 
+        {/* Modal Header */}
         <div className="bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#FD1D1D] p-6 text-white text-center relative overflow-hidden">
           <div className="inline-flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles className="w-3.5 h-3.5 text-amber-200" />
@@ -93,6 +95,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             Use seus clientes, personalidades e histórico em qualquer computador ou celular.
           </p>
 
+          {/* Device Sync Visual */}
           <div className="flex items-center justify-center gap-2 mt-4 text-[11px] font-medium text-white/90 bg-black/20 py-1.5 px-3 rounded-xl max-w-xs mx-auto">
             <Laptop className="w-4 h-4" />
             <span>PC</span>
@@ -103,13 +106,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
           </div>
         </div>
 
+        {/* Body */}
         <div className="p-6">
+          
+          {/* 1-Click Google OAuth Button */}
           <button
             type="button"
             disabled={isLoading}
             onClick={handleGoogleLogin}
             className="w-full py-3 px-4 rounded-xl border border-[#DBDBDB] dark:border-[#333333] hover:border-[#833AB4] bg-white dark:bg-[#1E1E1E] text-xs sm:text-sm font-bold text-[#262626] dark:text-white flex items-center justify-center gap-3 shadow-xs hover:shadow-md transition-all mb-4"
           >
+            {/* Google Colorful G Icon */}
             <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
               <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
@@ -119,6 +126,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             <span>Continuar com o Google</span>
           </button>
 
+          {/* Divider */}
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-[#DBDBDB] dark:bg-[#333333]" />
             <span className="text-[11px] text-[#737373] dark:text-[#A8A8A8] uppercase tracking-wider font-semibold">
@@ -127,6 +135,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             <div className="flex-1 h-px bg-[#DBDBDB] dark:bg-[#333333]" />
           </div>
 
+          {/* Tabs: Login / Cadastro */}
           <div className="flex bg-[#FAFAFA] dark:bg-[#121212] p-1 rounded-xl border border-[#DBDBDB] dark:border-[#333333] mb-4 text-xs font-bold">
             <button
               type="button"
@@ -148,6 +157,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             </button>
           </div>
 
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
             {tab === 'signup' && (
               <div>
@@ -225,6 +235,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }) {
             </button>
           </form>
 
+          {/* Safe Badge */}
           <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#737373] dark:text-[#A8A8A8] mt-4">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span>Dados 100% criptografados e sincronizados</span>
